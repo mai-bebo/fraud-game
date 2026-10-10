@@ -58,6 +58,11 @@ button{font:inherit;color:inherit}
 .hud{display:flex;gap:8px;align-items:center;margin-inline-start:auto;flex-wrap:wrap}
 .chip{display:inline-flex;align-items:center;gap:6px;background:var(--sheet);border:1px solid var(--line);border-radius:999px;padding:4px 14px;font-weight:600;font-size:.9rem;font-variant-numeric:tabular-nums;white-space:nowrap}
 .chip b{font-weight:700}
+.chip.demo{background:var(--signal);border-color:var(--signal);color:var(--signal-ink)}
+.locked{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px}
+.locked li{border:1.5px dashed var(--line);border-radius:10px;padding:8px 12px;color:var(--muted);font-weight:500}
+.locked li::before{content:"🔒 ";}
+.demo-end{border:2px solid var(--signal)}
 .iconbtn{cursor:pointer}
 .score-pop{animation:pop .45s ease}
 @keyframes pop{40%{transform:scale(1.15)}}
@@ -305,52 +310,6 @@ const CASES = [
   lesson: "البنك لا يطلب رقمك السري أبدًا. تواصل معه من رقمه الرسمي فقط."
 },
 {
-  title: "مبروك! ربحت هاتفًا", channel: "بريد إلكتروني", verdict: "fraud",
-  ctx: "رسالة في بريدك صباح الأحد. لم تشارك في أي مسابقة مؤخرًا.",
-  html: `<div class="device win"><div class="winbar"><i></i><i></i><i></i><span>البريد الوارد</span></div><div class="mail">
-    <div class="mrow"><span>من:</span><b>إدارة الجوائز</b> ${hs("from", '<span class="ltr">&lt;winner.prize2026@gmail.com&gt;</span>')}</div>
-    <div class="mrow"><span>الموضوع:</span><b>مبروك!! تم اختيارك للفوز بهاتف ذكي جديد</b></div>
-    <hr>
-    <p>${hs("generic", "عزيزي المستخدم،")}</p>
-    <p>${hs("nocontest", "تم اختيار بريدك عشوائيًا من بين مليون مستخدم")} للفوز بهاتف ذكي حديث. ${hs("typos", "الجائزه مضمونه 100% وسيتم تسليمها لباب منزلك")}.</p>
-    <p>${hs("fee", "لاستلام الجائزة يرجى دفع رسوم الشحن 49 دولار فقط")} عبر الاستمارة المرفقة.</p>
-    <div class="attach">${hs("attach", '<span class="file"><b>ZIP</b> استمارة_الجائزة.zip · 2.1MB</span>')}</div>
-    <p class="sig">فريق الجوائز العالمي</p></div></div>`,
-  flags: {
-    from: ["بريد مجاني لجهة رسمية", "الشركات الحقيقية تراسلك من نطاقها الخاص، لا من حساب Gmail أو Hotmail."],
-    generic: ["تحية عامة", "الجهة التي تعرفك تخاطبك باسمك. «عزيزي المستخدم» تعني أن الرسالة أُرسلت لآلاف العناوين."],
-    nocontest: ["جائزة من مسابقة لم تدخلها", "لا أحد يربح سحبًا لم يشارك فيه. هذا هو الطُعم."],
-    typos: ["أخطاء إملائية", "«الجائزه مضمونه» بدل «الجائزة مضمونة». الأخطاء الإملائية شائعة في رسائل الاحتيال."],
-    fee: ["ادفع لتستلم", "الجائزة الحقيقية لا تطلب رسومًا. الرسوم هي ربح المحتال، ومعها بيانات بطاقتك."],
-    attach: ["مرفق مضغوط غير متوقع", "ملفات ZIP المجهولة قد تحتوي برامج تسرق كلمات المرور."]
-  },
-  opts: [
-    ["أفتح المرفق لأقرأ شروط الجائزة", "bad", "المرفق قد يثبّت برنامجًا خبيثًا على جهازك بمجرد فتحه."],
-    ["أدفع الرسوم، 49 دولار مقابل هاتف صفقة رابحة", "bad", "ستخسر المبلغ وغالبًا بيانات بطاقتك، ولن يصل أي هاتف."],
-    ["أبلّغ عن الرسالة كتصيّد احتيالي ثم أحذفها", "best", "صحيح. الإبلاغ يساعد مزوّد البريد على حجب الرسالة عن غيرك."]
-  ],
-  lesson: "إذا لم تشارك في مسابقة، فأنت لم تربحها."
-},
-{
-  title: "شحنتك معلّقة", channel: "رسالة نصية", verdict: "fraud",
-  ctx: "لا تنتظر أي شحنة هذا الأسبوع، لكنك تتسوق أونلاين أحيانًا.",
-  html: phone("", head("س", hs("sender", '<span class="ltr">+63 912 448 0271</span>'), "رسالة نصية"),
-    `<div class="stamp-t">اليوم 2:47 م</div>
-     <div class="b">شركة سريع للتوصيل: شحنتك رقم SR-22918 ${hs("fee", "معلّقة بسبب رسوم جمركية غير مدفوعة قدرها 7.50 ريال")}.<br>${hs("deadline", "سيتم إرجاع الشحنة للمرسل خلال 12 ساعة")}.<br>ادفع الآن: ${hs("link", '<span class="lnk">sare3-delivery.top/pay</span>')}</div>`),
-  flags: {
-    sender: ["رقم أجنبي باسم شركة محلية", "شركة توصيل محلية لن تراسلك من رقم دولي."],
-    fee: ["مبلغ صغير جدًا", "المبلغ التافه يجعلك تدفع دون تفكير. الهدف رقم بطاقتك كاملًا، لا 7.50 ريال."],
-    deadline: ["مهلة ضاغطة", "التهديد بإرجاع الشحنة يدفعك للدفع فورًا دون أن تتحقق."],
-    link: ["نطاق غير رسمي", "الرقم 3 بدل حرف العين والامتداد .top علامتان على موقع مزيف."]
-  },
-  opts: [
-    ["أدفع، المبلغ بسيط ولا أريد خسارة الشحنة", "bad", "المبلغ طُعم. بعد إدخال البطاقة يستطيع المحتال سحب مبالغ أكبر."],
-    ["أضغط الرابط لأرى تفاصيل الشحنة فقط", "bad", "الصفحة نسخة مزيفة هدفها جمع بياناتك، ولن تعرض شحنة حقيقية."],
-    ["أفتح تطبيق شركة الشحن الرسمي وأبحث برقم التتبع", "best", "صحيح. إذا لم تجد الشحنة في التطبيق الرسمي فالرسالة مزيفة."]
-  ],
-  lesson: "لا تدفع رسومًا من رابط في رسالة. تحقق من التطبيق الرسمي."
-},
-{
   title: "ماما، هذا رقمي الجديد", channel: "تطبيق محادثة", verdict: "fraud",
   ctx: "رسالة من رقم غير محفوظ لدى الأم. ابنها خالد مسافر للدراسة.",
   html: phone("chat", head("خ", '<span class="ltr">+966 55 019 7734</span>', "ليس في جهات الاتصال", "#5E8C80"),
@@ -374,93 +333,6 @@ const CASES = [
     ["أتصل بخالد على رقمه القديم أو بأحد أصدقائه قبل أي تحويل", "best", "صحيح. مكالمة واحدة للرقم القديم تكشف الخدعة فورًا."]
   ],
   lesson: "رقم جديد مع طلب مال يعني أن تتصل بالرقم القديم أولًا."
-},
-{
-  title: "رمز تحقق من البنك", channel: "رسالة نصية", verdict: "safe",
-  ctx: "قبل دقيقة فتحت تطبيق بنكك بنفسك وطلبت تسجيل الدخول من جهاز جديد.",
-  html: phone("", head("و", "BankWatan", "معرّف مرسل موثّق", "#1B7F5B"),
-    `<div class="stamp-t">الآن</div>
-     <div class="b">بنك الوطن: رمز التحقق لتسجيل الدخول الذي طلبته هو <b class="ltr">482913</b>، صالح لمدة 5 دقائق.<br>لا تشارك هذا الرمز مع أي شخص، فموظفو البنك لن يطلبوه منك أبدًا.</div>`),
-  flags: {},
-  opts: [
-    ["أُدخل الرمز في التطبيق الذي فتحته بنفسي، ولا أرسله لأحد", "best", "صحيح. الرسالة متوقعة، ومن مرسل موثّق، بلا رابط، وتحذّرك من مشاركة الرمز."],
-    ["أحذفها، فكل رسائل البنوك احتيال", "mid", "الحذر جيد، لكنك طلبت هذا الرمز بنفسك. الشك في كل شيء يمنعك من استخدام خدماتك."],
-    ["أرسل الرمز لأخي ليتأكد إن كانت حقيقية", "bad", "الرمز يفتح حسابك لأي شخص يملكه. لا تشاركه مع أحد، ولو كان قريبًا."]
-  ],
-  lesson: "ليست كل رسالة احتيالًا. الرسالة التي توقعتها، بلا رابط وبلا طلب، غالبًا سليمة."
-},
-{
-  title: "عرض لا يُفوَّت", channel: "إعلان ممول", verdict: "fraud",
-  ctx: "ظهر لك هذا الإعلان أثناء التصفح. سعر الهاتف نفسه في المتاجر 4,999 ريال.",
-  html: `<div class="device phone social"><div class="screen"><div class="status"><span>9:41</span><span>5G ▮▮▮</span></div>
-    ${head("م", '<span class="ltr">mega_phone_deals26</span>', hs("newacc", "ممول · أُنشئ الحساب قبل أسبوعين"), "#B2457F")}
-    <div class="post-img">${hs("price", '<span class="pbadge">-85%</span>')}<div class="ph-ill"></div>${hs("timer", '<span class="timer ltr">ينتهي خلال 09:58</span>')}</div>
-    <div class="post-body"><div class="acts">♡ 2,481 إعجاب</div>
-      <div class="price">هاتف برو 256GB بـ 749 ريال <span class="off">4,999</span></div>
-      <div>الكمية محدودة! ${hs("pay", "الدفع بتحويل بنكي فقط، ولا يوجد دفع عند الاستلام")}.</div>
-      <div class="cmt">${hs("comments", "تم إيقاف التعليقات على هذا المنشور")}</div></div></div></div>`,
-  flags: {
-    newacc: ["حساب حديث", "متجر عمره أسبوعان بلا تاريخ ولا تقييمات لا يمكن الوثوق به."],
-    price: ["خصم غير منطقي", "خصم 85% على هاتف جديد. إذا بدا العرض أجمل من الحقيقة فهو غالبًا كذبة."],
-    timer: ["عداد تنازلي", "العداد يصنع ضغطًا مصطنعًا حتى لا تبحث عن سمعة المتجر."],
-    pay: ["تحويل بنكي فقط", "التحويل المباشر لا يمكن استرجاعه. المتاجر الحقيقية توفر طرق دفع محمية."],
-    comments: ["التعليقات مغلقة", "إغلاق التعليقات يخفي شكاوى الضحايا السابقين."]
-  },
-  opts: [
-    ["أراسلهم وأطلب الدفع عند الاستلام، وإن رفضوا لا أشتري", "mid", "خطوة حذرة، لكن العلامات كافية لتجاهل المتجر كليًا. بعضهم يقبل ثم يرسل صندوقًا فارغًا."],
-    ["أحوّل المبلغ بسرعة قبل انتهاء العرض", "bad", "العرض لا ينتهي أبدًا. العداد يعود للصفر مع كل زائر جديد، والمبلغ لن يعود."],
-    ["أتجاهل الإعلان وأشتري من متجر معروف أو الموقع الرسمي", "best", "صحيح. السعر الحقيقي معروف، والفرق الضخم هو العلامة الأوضح."]
-  ],
-  lesson: "سعر خيالي مع دفع بالتحويل فقط يعني أن تبتعد."
-},
-{
-  title: "وظيفة من البيت", channel: "مجموعة مراسلة", verdict: "fraud",
-  ctx: "أُضفت إلى مجموعة بعنوان «فرص عمل فورية» دون أن تطلب ذلك.",
-  html: phone("tg", head("ف", "فرص عمل فورية", "18,240 عضو", "#2F6DB8"),
-    `<div class="b">مطلوب موظفين لتقييم المنتجات أونلاين من المنزل.<br>${hs("income", "دخل من 300 إلى 800 دولار يوميًا بدون أي خبرة")}</div>
-     <div class="b">${hs("fee", "رسوم تفعيل الحساب 25 دولار فقط، تُسترد مع أول راتب")}</div>
-     <div class="b">${hs("noint", "بدون مقابلة وبدون عقد، والتواصل هنا فقط")}</div>
-     <div class="b">للتسجيل: ${hs("id", "أرسل صورة الهوية من الوجهين ورقم حسابك البنكي")}</div>
-     <div class="b">${hs("scarce", "بقي 3 مقاعد فقط!")}</div>`,
-    '<div class="composer">رسالة</div>'),
-  flags: {
-    income: ["دخل غير واقعي", "800 دولار يوميًا بلا خبرة أكثر مما يكسبه كثير من المتخصصين."],
-    fee: ["رسوم مقابل الوظيفة", "صاحب العمل الحقيقي يدفع لك، ولا يطلب منك الدفع ليوظفك."],
-    noint: ["لا مقابلة ولا عقد", "الشركة الحقيقية لها اسم وعنوان وعقد. هنا لا يوجد أي منها."],
-    id: ["طلب الهوية والحساب البنكي", "صورة الهوية تُستخدم لفتح حسابات أو أخذ قروض باسمك."],
-    scarce: ["ندرة مصطنعة", "«بقي 3 مقاعد» تُقال لكل شخص في المجموعة لتسرّع قراره."]
-  },
-  opts: [
-    ["أتجاهل العرض وأغادر المجموعة، وأبحث في منصات توظيف موثوقة", "best", "صحيح. الإضافة لمجموعة دون طلبك علامة إضافية بحد ذاتها."],
-    ["أدفع الـ25 دولار لأنها مستردة", "bad", "لن تُسترد. بعدها تأتي رسوم «تدريب» ثم «ضريبة» حتى تتوقف أنت."],
-    ["أرسل صورة الهوية فقط دون دفع", "bad", "الهوية أخطر من المال. قد تُستخدم لفتح حسابات أو أخذ قروض باسمك."]
-  ],
-  lesson: "الوظيفة الحقيقية تدفع لك، لا تطلب منك الدفع."
-},
-{
-  title: "مكالمة من قسم الأمن", channel: "مكالمة هاتفية", verdict: "fraud",
-  ctx: "اتصال يظهر على شاشتك باسم البنك. هذا نص ما قاله المتصل.",
-  html: `<div class="device phone call"><div class="screen"><div class="status"><span>9:41</span><span>5G ▮▮▮</span></div>
-    <div class="callhead"><div class="cav">و</div>${hs("callerid", '<span class="cid">بنك الوطن · قسم الأمن</span><span class="cnum">920 000 000</span>')}<span class="ctime ltr">02:14</span></div>
-    <div class="thread">
-      <div class="b">معك أحمد من إدارة الحماية. ${hs("fear", "رصدنا عملية شراء مشبوهة بقيمة 9,800 ريال على بطاقتك")}.</div>
-      <div class="b">لإيقافها سيصلك الآن رمز، ${hs("otp", "اقرأه لي بسرعة قبل أن تُخصم العملية")}.</div>
-      <div class="b">${hs("cvv", "وللتأكد من هويتك أعطني الأرقام الثلاثة خلف البطاقة")}.</div>
-      <div class="b">${hs("isolate", "لا تغلق الخط ولا تكلم أحدًا، العملية تُنفَّذ الآن")}.</div>
-    </div><div class="callbar"><i></i><i class="end"></i><i></i></div></div></div>`,
-  flags: {
-    callerid: ["الاسم على الشاشة ليس دليلًا", "يمكن تزييف رقم المتصل واسمه بسهولة ليظهر كأنه البنك."],
-    fear: ["تخويف بمبلغ كبير", "الخوف من خسارة 9,800 ريال يعطّل تفكيرك ويجعلك تنفّذ الأوامر."],
-    otp: ["طلب رمز التحقق", "الرمز هو مفتاح حسابك. من يطلبه محتال حتى لو عرف اسمك وآخر أرقام بطاقتك."],
-    cvv: ["طلب رمز CVV", "الأرقام خلف البطاقة تكفي للشراء أونلاين. البنك يملك بياناتك ولا يحتاجها منك."],
-    isolate: ["العزل والضغط", "منعك من إغلاق الخط أو استشارة أحد يهدف لإبقائك تحت السيطرة."]
-  },
-  opts: [
-    ["أعطيه الرمز فقط، ولا أعطيه الأرقام خلف البطاقة", "bad", "الرمز وحده كافٍ لتنفيذ عملية أو الدخول لحسابك."],
-    ["أطلب اسمه الكامل ورقمه الوظيفي ثم أكمل", "mid", "سيعطيك اسمًا ورقمًا وهميين بسهولة. هذا لا يثبت شيئًا."],
-    ["أنهي المكالمة وأتصل بالبنك بنفسي من الرقم الرسمي", "best", "صحيح. إن كانت هناك عملية مشبوهة فعلًا، سيخبرك البنك الحقيقي بها."]
-  ],
-  lesson: "إذا اتصل بك «البنك» وطلب رمزًا، أغلق الخط واتصل أنت."
 },
 {
   title: "حسابك سيُحذف", channel: "صفحة ويب", verdict: "fraud",
@@ -503,6 +375,7 @@ const GOLDEN = [
   "ليست كل رسالة احتيالًا. الرسالة المتوقعة، بلا رابط وبلا طلب، غالبًا سليمة."
 ];
 
+const DEMO = { full: 9, locked: ["مبروك! ربحت هاتفًا","شحنتك معلّقة","رمز تحقق من البنك","عرض لا يُفوَّت","وظيفة من البيت","مكالمة من قسم الأمن"] };
 const PTS = { flag: 100, falseAlarm: 25, hint: 50, best: 150, mid: 50, cleanSafe: 100 };
 const MAX = CASES.reduce((s, c) => s + Object.keys(c.flags).length * PTS.flag + PTS.best + (c.verdict === "safe" ? PTS.cleanSafe : 0), 0);
 
@@ -511,6 +384,7 @@ let S = freshState();
 function freshState(){ return { phase: "intro", i: 0, score: 0, found: [], falses: 0, hints: 0, choice: null, log: [] }; }
 
 const store = {
+  /* demo build */
   get(k){ try { return localStorage.getItem(k); } catch (e) { return null; } },
   set(k, v){ try { localStorage.setItem(k, v); } catch (e) { /* storage unavailable */ } }
 };
@@ -561,6 +435,7 @@ function topbar(){
   return `<div class="top">
     <button class="brand" id="home" type="button" aria-label="الشاشة الرئيسية">${EYE}<span>عين المحقق</span></button>
     <div class="hud">
+      <span class="chip demo">نسخة تجريبية · ${CASES.length} من ${DEMO.full} حالات</span>
       ${inGame ? `<span class="chip hide-sm">الحالة <b>${S.i + 1}</b> من ${CASES.length}</span>` : ""}
       ${S.phase !== "intro" ? `<span class="chip">النقاط <b id="score">${S.score}</b></span>` : ""}
       <button class="chip iconbtn" id="mute" type="button" aria-pressed="${muted}">${muted ? "الصوت: مغلق" : "الصوت: يعمل"}</button>
@@ -592,11 +467,11 @@ function render(keep){
 }
 
 function renderIntro(){
-  const best = +store.get("ein-best") || 0;
+  const best = +store.get("ein-demo-best") || 0;
   app.innerHTML = `<div class="tape"></div><div class="wrap">${topbar()}
   <section class="hero">
     <div>
-      <p class="eyebrow">تدريب تفاعلي على كشف الاحتيال · ${CASES.length} حالات حقيقية الطابع</p>
+      <p class="eyebrow">نسخة تجريبية · ${CASES.length} حالات من أصل ${DEMO.full}</p>
       <h1>هل تكشف <span>المحتال</span> قبل أن يكشفك؟</h1>
       <p class="lead">رسائل وروابط ومكالمات تصل إلى الناس كل يوم. افحص كل حالة كما يفعل المحقق، واضغط على كل ما يبدو مريبًا، ثم قرّر ماذا ستفعل.</p>
       <div class="steps">
@@ -606,7 +481,7 @@ function renderIntro(){
       </div>
       <div class="row">
         <button class="btn signal big" id="start" type="button">ابدأ التحقيق</button>
-        <span class="meta">نحو 10 دقائق${best ? ` · أفضل نتيجة لك: ${best} من ${MAX}` : ""}</span>
+        <span class="meta">نحو 4 دقائق${best ? ` · أفضل نتيجة لك: ${best} من ${MAX}` : ""}</span>
       </div>
     </div>
     <div class="hero-art">${heroArt()}</div>
@@ -776,8 +651,8 @@ function choose(c, n){
 function nextCase(){
   if (S.i === CASES.length - 1) {
     S.phase = "results";
-    const best = +store.get("ein-best") || 0;
-    if (S.score > best) store.set("ein-best", String(S.score));
+    const best = +store.get("ein-demo-best") || 0;
+    if (S.score > best) store.set("ein-demo-best", String(S.score));
   } else {
     S.i++; S.phase = "scan"; S.found = []; S.falses = 0; S.choice = null;
   }
@@ -817,6 +692,9 @@ function renderResults(){
         }).join("")}</ul></div>
         <div class="panel"><h3>القواعد الذهبية</h3><ol class="golden">${GOLDEN.map(g => `<li>${esc(g)}</li>`).join("")}</ol></div>
       </div>
+      <div class="panel demo-end"><h3>أنهيت النسخة التجريبية</h3>
+        <p>لعبت ${CASES.length} حالات من أصل ${DEMO.full}. النسخة الكاملة تضم أيضًا الحالات التالية، وتُسلَّم مع التخصيص حسب جمهورك وهويتك البصرية:</p>
+        <ul class="locked">${DEMO.locked.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div>
       <div class="row"><button class="btn signal big" id="again" type="button">العب مرة أخرى</button>
       <button class="btn ghost" id="toIntro" type="button">الشاشة الرئيسية</button></div>
     </section></div>`;
